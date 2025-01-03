@@ -27,5 +27,5 @@ urlpatterns = [
     path('profile/edit/', views.edit_profile, name='edit_profile'),
     path('profile/edit/user_data/', views.edit_user_data, name='edit_user_data'),
     path('profile/edit/avatar/', views.edit_avatar, name='edit_avatar'),
-    path('profile/edit/password/', views.edit_password, name='edit_password'),
+    path('profile/edit/password/', views.change_password, name='edit_password'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

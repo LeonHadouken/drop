@@ -1,41 +1,57 @@
 {% extends 'base.html' %}
 
 {% block content %}
+  {% if user.is_authenticated %}
+    <h1><b>Можно нас поздравить, оболочка готова.</b></h1>
+    <h2>Описание трудов.</h2>
+    <h3>Плюсы:</h3>
+    <ul>
+      <li>Навигация и скелет готовы.</li>
+      <li>Личный кабинет готов.</li>
+      <li>Регистрация работает.</li>
+      <li>Суперюзеры видят админку, остальные — нет.</li>
 
+      <li>Суперюзеры не видят поддержку, они и есть — поддержка.</li>
+      <li>Создан подкласс премиум-юзера и роль модератора, модеры видят черные списки.</li>
+      <li>Все вышеперечисленные типы юзеров могут видеть карту.</li>
+      <li>Все присваивается через <code>localhost/admin</code>.</li>
+    </ul>
+    <h3>Минусы:</h3>
+    <ul>
+      <li>Карты нет.</li>
+      <li>Пока неясно, какими параметрами еще нужно будет нагрузить юзера.</li>
+      <li>Пароль пока не меняется из личного кабинета. (Через <code>localhost/admin</code> супер-юзер может изменить вручную любую учетную запись.)</li>
+      <li>Для аватаров не выделена директория. Нужно придумать динамическое значение.</li>
+    </ul>
+    <h1><b>ПЛАН</b></h1>
+    <h3>1. Попытаться получить контроль над точками спавна игрока.</h3>
+    <ul>
+      <li>Связать оболочку с RCon.</li>
+      <li>Дать платформе понять по имени персонажа на сервере всю необходимую информацию через RCon.</li>
+    </ul>
+    <h3>2. Получить контроль над списками.</h3>
+    <ul>
+      <li>В приоритете <code>types/types_dzn</code>.</li>
+    </ul>
+    <h3>3. Нацепить карту Намальска, пока без динамики.</h3>
 
-
-{% if user.is_authenticated %}
-
-ИНФА НА ДОМАШНЕЙ СТРАНИЦЕ
-
-
-
-
-
-{% else %}
-
-<div class="col-md-6 offset-md-3">
-<h1>Добро пожаловать.</h1>
-<h3>Войдите в учетную запись или зарегистрируйтесь.</h3>
-<br/>
-
-<form method="POST" action="{% url 'index' %}">
-	{% csrf_token %}
-
-  <div class="mb-3">
-    <input type="text" class="form-control" name="username", placeholder="Имя пользователя" required>
-
-  </div><br/>
-  <div class="mb-3">
-    <input type="password" class="form-control" name="password", placeholder="Пароль" required>
-  </div>
-  <br/>
-  <button type="submit" class="btn btn-secondary">Войти</button>
-
-</form>
-
-
-
-{% endif %}
-
+  {% else %}
+    <div class="col-md-6 offset-md-3">
+      <h1>Добро пожаловать.</h1>
+      <h3>Войдите в учетную запись или зарегистрируйтесь.</h3>
+      <br/>
+      <form method="POST" action="{% url 'index' %}">
+        {% csrf_token %}
+        <div class="mb-3">
+          <input type="text" class="form-control" name="username" placeholder="Имя пользователя" required>
+        </div>
+        <br/>
+        <div class="mb-3">
+          <input type="password" class="form-control" name="password" placeholder="Пароль" required>
+        </div>
+        <br/>
+        <button type="submit" class="btn btn-secondary">Войти</button>
+      </form>
+    </div>
+  {% endif %}
 {% endblock %}

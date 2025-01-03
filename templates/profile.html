@@ -41,7 +41,7 @@
     {% endif %}
 
     <!-- Кнопка редактирования профиля для суперпользователей -->
-    {% if not user.is_superuser %}
+    {% if user.is_superuser %}
       <div class="mt-4 text-center">
         <a href="{% url 'edit_profile' %}" class="btn btn-primary px-4 py-2">Редактировать профиль</a>
       </div>

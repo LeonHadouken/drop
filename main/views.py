@@ -1,10 +1,10 @@
+from django.shortcuts import render, redirect
 from authentication.forms import UserEditForm, ProfileForm, CustomPasswordChangeForm
 from django.contrib.auth import update_session_auth_hash, authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from authentication.models import Profile
-from django.shortcuts import render, redirect
 from django.shortcuts import get_object_or_404
 
 def index(request):
@@ -137,19 +137,23 @@ def edit_avatar(request):
         'password_form': CustomPasswordChangeForm(request.user),  # Для пароля
     })
 
-def edit_password(request):
+def change_password(request):
     if request.method == 'POST':
-        password_form = CustomPasswordChangeForm(request.user, request.POST)
-        if password_form.is_valid():
-            user = password_form.save()
-            update_session_auth_hash(request, user)
-            return redirect('edit')
+        # Создаем форму с данными из POST-запроса
+        form = CustomPasswordChangeForm(user=request.user, data=request.POST)
+        if form.is_valid():  # Проверяем, что форма валидна
+            form.save()  # Сохраняем новый пароль
+            messages.success(request, "Пароль изменен!")
+            print("Пароль изменён!")  # Это отладочное сообщение
+            update_session_auth_hash(request, form.user)  # Обновляем сессию, чтобы пользователь не был разлогинен
+            return redirect('profile')  # Перенаправляем на страницу профиля после успешного изменения пароля
+        else:
+            messages.error(request, "Ошибка.")
+            print(form.errors)  # Выводим ошибки, если форма не валидна
     else:
-        password_form = CustomPasswordChangeForm(request.user)
+        # Если запрос не POST, то создаем пустую форму для отображения
+        form = CustomPasswordChangeForm(user=request.user)
 
-    return render(request, 'profile/edit.html', {
-        'password_form': password_form,
-        'form': UserEditForm(instance=request.user),  # Для данных пользователя
-        'profile_form': ProfileForm(instance=request.user.profile),  # Для аватара
-    })
+    # Возвращаем шаблон с формой
+    return render(request, 'profile/edit.html', {'form': form})
 

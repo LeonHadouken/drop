@@ -46,10 +46,11 @@
                     <h3>Изменение пароля</h3>
                     <form method="POST">
                         {% csrf_token %}
-                        {{ password_form.as_p }}
-                        <button type="submit" name="password" class="btn btn-primary">Сохранить</button>
+                        {{ password_form.as_p }}  <!-- Рендерим форму изменения пароля -->
+                        <button type="submit" class="btn btn-primary">Сохранить</button>
                     </form>
                 </div>
+
             </div>
         </div>
     </div>
