@@ -36,11 +36,11 @@
           </a>
           <ul class="dropdown-menu" style="background-color: #34495e;">
             <li><a class="dropdown-item text-light" href="#">Оружие</a></li>
+            <li><a class="dropdown-item text-light" href="#">Снаряжение</a></li>
+            <li><hr class="dropdown-divider text-light"></li>
             <li><a class="dropdown-item text-light" href="#">Инструменты</a></li>
             <li><hr class="dropdown-divider text-light"></li>
             <li><a class="dropdown-item text-light" href="#">Транспорт</a></li>
-            <li><hr class="dropdown-divider text-light"></li>
-            <li><a class="dropdown-item text-light" href="#">Снаряжение</a></li>
             <li><hr class="dropdown-divider text-light"></li>
             <li><a class="dropdown-item text-light" href="#">Быстрое перемещение</a></li>
           </ul>
@@ -52,17 +52,19 @@
           </a>
           <ul class="dropdown-menu" style="background-color: #34495e;">
             {% if user.is_superuser %}
-            <li><a class="dropdown-item text-light" href="#">Списки предметов</a></li>
-            <li><a class="dropdown-item text-light" href="#">Свойства и содержимое предметов</a></li>
-            <li><a class="dropdown-item text-light" href="#">Точки спавна предметов</a></li>
-            <li><hr class="dropdown-divider text-light"></li>
+            <li><a class="dropdown-item text-light" href="#">Спавн игроков</a></li>
+            <li><a class="dropdown-item text-light" href="#">Спавн предметов</a></li>
             <li><a class="dropdown-item text-light" href="#">Спавн зомби</a></li>
-            <li><hr class="dropdown-divider text-light"></li>
             <li><a class="dropdown-item text-light" href="#">Спавн животных</a></li>
+            <li><hr class="dropdown-divider text-light"></li>
+            <li><a class="dropdown-item text-light" href="#">Списки предметов</a></li>
+            <li><a class="dropdown-item text-light" href="#">Теги и Категории</a></li>
+            <li><a class="dropdown-item text-light" href="#">Свойства оружия</a></li>
+            <li><a class="dropdown-item text-light" href="#">Содержимое контейнеров</a></li>
+            <li><a class="dropdown-item text-light" href="#">Свойства предметов</a></li>
             <li><hr class="dropdown-divider text-light"></li>
             <li><a class="dropdown-item text-light" href="#">Экономика и цены</a></li>
             <li><a class="dropdown-item text-light" href="#">Пресеты для лутбоксов</a></li>
-            <li><hr class="dropdown-divider text-light"></li>
             {% endif %}
             {% if user.profile.is_moderator %}
             <li><a class="dropdown-item text-light" href="#">Черные списки</a></li>
