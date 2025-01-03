@@ -3,6 +3,8 @@ from django.contrib import messages
 from django.shortcuts import render, redirect
 from .forms import SignUpForm
 from .models import Profile
+from authentication.forms import ProfileForm  # Теперь правильный импорт
+
 
 def register_user(request):
     if request.method == 'POST':

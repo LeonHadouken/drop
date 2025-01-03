@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>Редактирование профиля</h2>
+    <div class="row">
+        <div class="col-md-3">
+            <!-- Вкладки для переключения -->
+            <ul class="nav nav-pills flex-column">
+                <li class="nav-item">
+                    <a class="nav-link {% if active_tab == 'user-data' %}active{% endif %}" id="user-data-tab" data-bs-toggle="pill" href="#user-data">Личные данные</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if active_tab == 'avatar' %}active{% endif %}" id="avatar-tab" data-bs-toggle="pill" href="#avatar">Аватар</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if active_tab == 'password' %}active{% endif %}" id="password-tab" data-bs-toggle="pill" href="#password">Пароль</a>
+                </li>
+            </ul>
+        </div>
+        <div class="col-md-9">
+            <!-- Контент вкладок -->
+            <div class="tab-content">
+                <!-- Вкладка с изменением личных данных -->
+                <div class="tab-pane fade show {% if active_tab == 'user-data' %}active{% endif %}" id="user-data">
+                    <h3>Изменение личных данных</h3>
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {{ user_form.as_p }}
+                        <button type="submit" name="user_data" class="btn btn-primary">Сохранить</button>
+                    </form>
+                </div>
+
+                <!-- Вкладка с изменением аватара -->
+                <div class="tab-pane fade {% if active_tab == 'avatar' %}show active{% endif %}" id="avatar">
+                    <h3>Изменение аватара</h3>
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {{ profile_form.as_p }}
+                        <button type="submit" name="avatar" class="btn btn-primary">Сохранить</button>
+                    </form>
+                </div>
+
+                <!-- Вкладка с изменением пароля -->
+                <div class="tab-pane fade {% if active_tab == 'password' %}show active{% endif %}" id="password">
+                    <h3>Изменение пароля</h3>
+                    <form method="POST">
+                        {% csrf_token %}
+                        {{ password_form.as_p }}
+                        <button type="submit" name="password" class="btn btn-primary">Сохранить</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

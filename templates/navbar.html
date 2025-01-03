@@ -4,8 +4,13 @@
       {% if user.is_authenticated %}
         <li class="nav-item dropdown d-flex align-items-center">
           <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            {{ user.username }}
+        {% if profile and profile.avatar %}
+          <img src="{{ profile.avatar.url }}" alt="Аватар пользователя">
+        {% else %}
+          <span>{{ user.username }}</span>
+        {% endif %}
           </a>
+
           <ul class="dropdown-menu" style="background-color: #34495e;">
             <li><a class="dropdown-item text-light" href="{% url 'profile' %}">Мой профиль</a></li>
             <li><a class="dropdown-item text-light" href="{% url 'logout' %}">Выйти</a></li>
@@ -14,7 +19,7 @@
       {% else %}
         Yoba Community
       {% endif %}
-    </a>
+    </a>    </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon" style="color: white;"></span>
     </button>
@@ -40,12 +45,13 @@
             <li><a class="dropdown-item text-light" href="#">Быстрое перемещение</a></li>
           </ul>
         </li>
-        {% if user.is_superuser %}
+        {% if user.is_superuser or user.profile.is_moderator%}
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
             Админ панель
           </a>
           <ul class="dropdown-menu" style="background-color: #34495e;">
+            {% if user.is_superuser %}
             <li><a class="dropdown-item text-light" href="#">Списки предметов</a></li>
             <li><a class="dropdown-item text-light" href="#">Свойства и содержимое предметов</a></li>
             <li><a class="dropdown-item text-light" href="#">Точки спавна предметов</a></li>
@@ -57,13 +63,22 @@
             <li><a class="dropdown-item text-light" href="#">Экономика и цены</a></li>
             <li><a class="dropdown-item text-light" href="#">Пресеты для лутбоксов</a></li>
             <li><hr class="dropdown-divider text-light"></li>
+            {% endif %}
+            {% if user.profile.is_moderator %}
             <li><a class="dropdown-item text-light" href="#">Черные списки</a></li>
+            {% endif %}
           </ul>
         </li>
         {% endif %}
+        {% if user.is_superuser or user.profile.is_moderator or user.profile.is_premium %}
         <li class="nav-item">
-          <a class="nav-link disabled text-secondary" aria-disabled="true">Карта</a>
+          <a class="nav-link active text-white" aria-current="page" href="#">Карта</a>
         </li>
+        {% else %}
+        <li>
+          <a class="nav-link disabled text-light" aria-disabled="true">Карта</a>
+        </li>
+        {% endif %}
         {% if not user.is_superuser %}
         <li class="nav-item">
           <a class="nav-link text-white" href="#">Поддержка</a>

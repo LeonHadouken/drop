@@ -1,10 +1,11 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login, logout
+from authentication.forms import UserEditForm, ProfileForm, CustomPasswordChangeForm
+from django.contrib.auth import update_session_auth_hash, authenticate, login, logout
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import UserChangeForm
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 from authentication.models import Profile
+from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404
 
 def index(request):
 	# Check to see if logging in
@@ -54,21 +55,101 @@ def profile(request):
 		'user': user,
 		'profile': profile
 	})
+
 @login_required
 def edit_profile(request):
+    user = request.user
+    profile = get_object_or_404(Profile, user=user)
+
+    # Инициализируем формы
+    user_form = UserEditForm(instance=user)
+    profile_form = ProfileForm(instance=profile)
+    password_form = CustomPasswordChangeForm(user)
+
+    active_tab = request.GET.get('tab', 'user-data')  # Получаем активную вкладку из GET-параметра
+
+    # Обрабатываем POST-запрос
     if request.method == 'POST':
-        form = UserChangeForm(request.POST, instance=request.user)
-        if form.is_valid():
-            form.save()
-            return redirect('profile')  # Перенаправление на страницу профиля
+        if 'user_data' in request.POST:  # Если отправлена форма данных пользователя
+            user_form = UserEditForm(request.POST, instance=user)
+            profile_form = ProfileForm(request.POST, request.FILES, instance=profile)
+            if user_form.is_valid() and profile_form.is_valid():
+                user_form.save()
+                profile_form.save()
+                return redirect('edit_profile') + '?tab=user-data'
+
+        elif 'avatar' in request.POST:  # Если отправлена форма аватара
+            profile_form = ProfileForm(request.POST, request.FILES, instance=profile)
+            if profile_form.is_valid():
+                profile_form.save()
+                return redirect('edit_profile') + '?tab=avatar'
+
+        elif 'password' in request.POST:  # Если отправлена форма пароля
+            password_form = CustomPasswordChangeForm(user, request.POST)
+            if password_form.is_valid():
+                user = password_form.save()
+                update_session_auth_hash(request, user)  # Оставляем пользователя в системе
+                return redirect('edit_profile') + '?tab=password'
+
+    # Передаём все формы в шаблон
+    return render(request, 'profile/edit.html', {
+        'user_form': user_form,
+        'profile_form': profile_form,
+        'password_form': password_form,
+        'active_tab': active_tab,  # Передаем активную вкладку для подсветки
+    })
+
+def edit_user_data(request):
+    profile = get_object_or_404(Profile, user=request.user)
+
+    if request.method == 'POST':
+        user_form = UserEditForm(request.POST, instance=request.user)
+        profile_form = ProfileForm(request.POST, request.FILES, instance=profile)
+
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
+            profile_form.save()
+            return redirect('edit')
     else:
-        form = UserChangeForm(instance=request.user)
+        user_form = UserEditForm(instance=request.user)
+        profile_form = ProfileForm(instance=profile)
 
-    # Если не суперпользователь, ограничиваем доступ к полям
-    if not request.user.is_superuser:
-        # Выбираем поля, которые можно редактировать
-        form.fields['username'].widget.attrs['readonly'] = True  # Имя пользователя только для чтения
-        form.fields['email'].widget.attrs['readonly'] = True  # Почта только для чтения
-        form.fields['password'].widget.attrs['readonly'] = True  # Пароль только для чтения
+    return render(request, 'profile/edit.html', {
+        'form': user_form,
+        'profile_form': profile_form,
+        'password_form': CustomPasswordChangeForm(request.user),  # Для пароля
+    })
 
-    return render(request, 'edit_profile.html', {'form': form})
+def edit_avatar(request):
+    profile = get_object_or_404(Profile, user=request.user)
+
+    if request.method == 'POST':
+        profile_form = ProfileForm(request.POST, request.FILES, instance=profile)
+        if profile_form.is_valid():
+            profile_form.save()
+            return redirect('edit')
+    else:
+        profile_form = ProfileForm(instance=profile)
+
+    return render(request, 'profile/edit.html', {
+        'profile_form': profile_form,
+        'form': UserEditForm(instance=request.user),  # Для данных пользователя
+        'password_form': CustomPasswordChangeForm(request.user),  # Для пароля
+    })
+
+def edit_password(request):
+    if request.method == 'POST':
+        password_form = CustomPasswordChangeForm(request.user, request.POST)
+        if password_form.is_valid():
+            user = password_form.save()
+            update_session_auth_hash(request, user)
+            return redirect('edit')
+    else:
+        password_form = CustomPasswordChangeForm(request.user)
+
+    return render(request, 'profile/edit.html', {
+        'password_form': password_form,
+        'form': UserEditForm(instance=request.user),  # Для данных пользователя
+        'profile_form': ProfileForm(instance=request.user.profile),  # Для аватара
+    })
+

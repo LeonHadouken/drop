@@ -17,11 +17,15 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from main import views
-
+from django.conf import settings
+from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index, name='index'),
     path('auth/', include('authentication.urls')),
     path('profile/', views.profile, name='profile'),
     path('profile/edit/', views.edit_profile, name='edit_profile'),
-]
+    path('profile/edit/user_data/', views.edit_user_data, name='edit_user_data'),
+    path('profile/edit/avatar/', views.edit_avatar, name='edit_avatar'),
+    path('profile/edit/password/', views.edit_password, name='edit_password'),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
