@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>Личный кабинет</h2>
+  <p><strong>Имя пользователя:</strong> {{ user.username }}</p>
+  <p><strong>Электронная почта:</strong> {{ user.email }}</p>
+  <p><strong>Дата регистрации:</strong> {{ user.date_joined|date:"d.m.Y H:i" }}</p>
+
+  <!-- Проверяем наличие профиля и выводим статус -->
+  {% if profile %}
+    {% if profile.is_premium %}
+      <p><strong>Статус:</strong> Премиум пользователь</p>
+    {% else %}
+      <p><strong>Статус:</strong> Обычный пользователь</p>
+    {% endif %}
+
+    {% if profile.is_moderator %}
+      <p><strong>Роль:</strong> Модератор</p>
+    {% else %}
+      <p><strong>Роль:</strong> Обычный пользователь</p>
+    {% endif %}
+  {% else %}
+    <p><strong>Статус:</strong> Не назначен</p>
+  {% endif %}
+
+  {% if user.is_superuser %}
+    <a href="{% url 'edit_profile' %}" class="btn btn-primary">Редактировать профиль</a>
+  {% endif %}
+</div>
+{% endblock %}

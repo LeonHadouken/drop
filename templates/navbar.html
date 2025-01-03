@@ -1,36 +1,145 @@
-<nav class="navbar navbar-expand-lg bg-body-tertiary">
+<nav class="navbar navbar-expand-lg fixed-top" style="background-color: #1c2833; z-index: 1030;">
   <div class="container-fluid">
-    <a class="navbar-brand" href="#">Navbar</a>
+    <a class="navbar-brand text-white" href="">
+      {% if user.is_authenticated %}
+        <li class="nav-item dropdown d-flex align-items-center">
+          <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            {{ user.username }}
+          </a>
+          <ul class="dropdown-menu" style="background-color: #34495e;">
+            <li><a class="dropdown-item text-light" href="{% url 'profile' %}">Мой профиль</a></li>
+            <li><a class="dropdown-item text-light" href="{% url 'logout' %}">Выйти</a></li>
+          </ul>
+        </li>
+      {% else %}
+        Yoba Community
+      {% endif %}
+    </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
+      <span class="navbar-toggler-icon" style="color: white;"></span>
     </button>
+
+    {% if user.is_authenticated %}
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="#">Home</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Link</a>
+          <a class="nav-link active text-white" aria-current="page" href="{% url "index" %}">Главная</a>
         </li>
         <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Dropdown
+          <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Магазин
           </a>
-          <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="#">Action</a></li>
-            <li><a class="dropdown-item" href="#">Another action</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="#">Something else here</a></li>
+          <ul class="dropdown-menu" style="background-color: #34495e;">
+            <li><a class="dropdown-item text-light" href="#">Оружие</a></li>
+            <li><a class="dropdown-item text-light" href="#">Инструменты</a></li>
+            <li><hr class="dropdown-divider text-light"></li>
+            <li><a class="dropdown-item text-light" href="#">Транспорт</a></li>
+            <li><hr class="dropdown-divider text-light"></li>
+            <li><a class="dropdown-item text-light" href="#">Снаряжение</a></li>
+            <li><hr class="dropdown-divider text-light"></li>
+            <li><a class="dropdown-item text-light" href="#">Быстрое перемещение</a></li>
           </ul>
         </li>
-        <li class="nav-item">
-          <a class="nav-link disabled" aria-disabled="true">Disabled</a>
+        {% if user.is_superuser %}
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Админ панель
+          </a>
+          <ul class="dropdown-menu" style="background-color: #34495e;">
+            <li><a class="dropdown-item text-light" href="#">Списки предметов</a></li>
+            <li><a class="dropdown-item text-light" href="#">Свойства и содержимое предметов</a></li>
+            <li><a class="dropdown-item text-light" href="#">Точки спавна предметов</a></li>
+            <li><hr class="dropdown-divider text-light"></li>
+            <li><a class="dropdown-item text-light" href="#">Спавн зомби</a></li>
+            <li><hr class="dropdown-divider text-light"></li>
+            <li><a class="dropdown-item text-light" href="#">Спавн животных</a></li>
+            <li><hr class="dropdown-divider text-light"></li>
+            <li><a class="dropdown-item text-light" href="#">Экономика и цены</a></li>
+            <li><a class="dropdown-item text-light" href="#">Пресеты для лутбоксов</a></li>
+            <li><hr class="dropdown-divider text-light"></li>
+            <li><a class="dropdown-item text-light" href="#">Черные списки</a></li>
+          </ul>
         </li>
+        {% endif %}
+        <li class="nav-item">
+          <a class="nav-link disabled text-secondary" aria-disabled="true">Карта</a>
+        </li>
+        {% if not user.is_superuser %}
+        <li class="nav-item">
+          <a class="nav-link text-white" href="#">Поддержка</a>
+        </li>
+        {% endif %}
       </ul>
-      <form class="d-flex" role="search">
-        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-        <button class="btn btn-outline-success" type="submit">Search</button>
+      {% if user.is_superuser %}
+      <form class="d-flex me-3" role="search">
+        <input class="form-control me-2" type="search" placeholder="Поиск предметов" aria-label="Search" style="background-color: #d5eaf1; border: 1px solid #5dade2; color: #1c2833;">
+        <button class="btn btn-search" type="submit">Найти</button>
       </form>
+      {% endif %}
     </div>
+    {% else %}
+    <div class="d-flex">
+      <a href="{% url 'index' %}" class="btn btn-outline-light me-2 login-btn">Вход</a>
+      <a href="{% url 'register' %}" class="btn btn-outline-light register-btn">Регистрация</a>
+    </div>
+    {% endif %}
   </div>
 </nav>
+
+<style>
+  body {
+    padding-top: 70px; /* Высота панели + небольшой запас */
+  }
+
+  .login-btn, .register-btn {
+    border-color: #d5eaf1;
+  }
+
+  .login-btn:hover, .register-btn:hover {
+    color: white;
+    background-color: #5dade2;
+    border-color: #5dade2;
+  }
+
+  .navbar {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); /* Добавление теней */
+  }
+
+  .dropdown-menu .dropdown-item:hover {
+    background-color: #5dade2; /* Ледяной голубой для ховер эффекта */
+  }
+
+  .nav-link:hover {
+    color: #a9cce3 !important; /* Светлый голубой при наведении */
+  }
+
+  .btn-search {
+    background: linear-gradient(135deg, #5dade2, #2e86c1); /* Ледяной градиент */
+    color: white;
+    border: none;
+    font-weight: bold;
+  }
+
+  .btn-search:hover {
+    background: linear-gradient(135deg, #2e86c1, #1c2833); /* Становится темнее при наведении */
+    color: #d5eaf1;
+  }
+
+  .navbar-toggler {
+    background-color: #5dade2; /* Цвет фона кнопки */
+    border: none; /* Убираем границу */
+  }
+
+  .navbar-toggler:hover {
+    background-color: #2e86c1; /* Цвет фона при наведении */
+  }
+
+  .navbar-toggler .navbar-toggler-icon {
+    color: white; /* Цвет иконки */
+  }
+
+  .nav-item.dropdown {
+    display: flex;
+    align-items: center;
+  }
+</style>
