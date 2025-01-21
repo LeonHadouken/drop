@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+{% block content %}
+
+    <h1 class="page-title">Types and Types DZN Data</h1>
+
+    <style>
+        .filters {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .card-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .card {
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            background: var(--background-light);
+            width: calc(33% - 20px);
+            box-shadow: var(--box-shadow);
+        }
+
+        .card h3 {
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .card-section {
+            margin-bottom: 15px;
+        }
+
+        .card-section label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .card-section input {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .card {
+                width: calc(50% - 20px);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .card {
+                width: 100%;
+            }
+        }
+    </style>
+
+    <script>
+        function toggleCardDetails(cardId) {
+            const details = document.getElementById(cardId);
+            details.classList.toggle('hidden');
+        }
+
+        function toggleSectionVisibility(sectionClass, checkboxId) {
+            const sections = document.querySelectorAll(`.${sectionClass}`);
+            const checkbox = document.getElementById(checkboxId);
+            sections.forEach(section => section.style.display = checkbox.checked ? 'block' : 'none');
+        }
+
+        function searchItems() {
+            const query = document.getElementById("searchInput").value.toLowerCase();
+            const cards = document.querySelectorAll(".card");
+            cards.forEach(card => {
+                const nameField = card.querySelector(".name-field");
+                card.style.display = nameField && nameField.value.toLowerCase().includes(query) ? 'block' : 'none';
+            });
+        }
+    </script>
+
+    <!-- Filters -->
+    <div class="filters">
+        <div>
+            <label>
+                <input type="checkbox" id="showTypes" checked onchange="toggleSectionVisibility('types-section', 'showTypes')">
+                Show Types
+            </label>
+            <label>
+                <input type="checkbox" id="showDZN" checked onchange="toggleSectionVisibility('dzn-section', 'showDZN')">
+                Show Types DZN
+            </label>
+        </div>
+        <input type="text" id="searchInput" class="search-bar" placeholder="Search by Name" oninput="searchItems()">
+    </div>
+
+    <form method="POST" class="data-form">
+        {% csrf_token %}
+
+        <!-- Types Section -->
+        <div class="types-section">
+            <h2 class="section-title">Types</h2>
+            <div class="card-container">
+                {% for type in data.types %}
+                <div class="card">
+                    <h3 class="clickable" onclick="toggleCardDetails('typesDetails_{{ forloop.counter }}')">{{ type.name }}</h3>
+                    <div id="typesDetails_{{ forloop.counter }}">
+
+                        <div class="card-section">
+                            <label>Name:</label>
+                            <input class="name-field" type="text" name="types_name_{{ forloop.counter }}" value="{{ type.name }}">
+                        </div>
+
+                        <div class="card-section">
+                            <label>Nominal:</label>
+                            <input type="text" name="types_nominal_{{ forloop.counter }}" value="{{ type.nominal }}">
+                        </div>
+
+                        <div class="card-section">
+                            <label>Lifetime:</label>
+                            <input type="text" name="types_lifetime_{{ forloop.counter }}" value="{{ type.lifetime }}">
+                        </div>
+
+                        <div class="card-section">
+                            <label>Flags:</label>
+                            <div>
+                                {% for flag, value in type.flags.items %}
+                                <div>
+                                    <label>{{ flag }}</label>
+                                    <input type="checkbox" name="types_flags_{{ flag }}_{{ forloop.counter }}" value="1" {% if value == '1' %}checked{% endif %}>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="card-section">
+                            <label>Category:</label>
+                            <input type="text" name="types_category_{{ forloop.counter }}" value="{{ type.category }}">
+                        </div>
+
+                        <div class="card-section">
+                            <label>Attachments:</label>
+                            {% for attachment in type.attachments %}
+                            <div>
+                                <label>Name:</label>
+                                <input type="text" name="types_attachments_item_name_{{ forloop.counter }}_{{ forloop.counter0 }}" value="{{ attachment.name }}">
+                                <label>Chance:</label>
+                                <input type="text" name="types_attachments_item_chance_{{ forloop.counter }}_{{ forloop.counter0 }}" value="{{ attachment.chance }}">
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <button type="submit" name="save_item" value="{{ forloop.counter }}" class="save-button">Save</button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Types DZN Section -->
+        <div class="dzn-section">
+            <h2 class="section-title">Types DZN</h2>
+            <div class="card-container">
+                {% for type in data.types_dzn %}
+                <div class="card">
+                    <h3 class="clickable" onclick="toggleCardDetails('dznDetails_{{ forloop.counter }}')">{{ type.name }}</h3>
+                    <div id="dznDetails_{{ forloop.counter }}">
+
+                        <div class="card-section">
+                            <label>Name:</label>
+                            <input class="name-field" type="text" name="types_dzn_name_{{ forloop.counter }}" value="{{ type.name }}">
+                        </div>
+
+                        <div class="card-section">
+                            <label>Nominal:</label>
+                            <input type="text" name="types_dzn_nominal_{{ forloop.counter }}" value="{{ type.nominal }}">
+                        </div>
+
+                        <div class="card-section">
+                            <label>Lifetime:</label>
+                            <input type="text" name="types_dzn_lifetime_{{ forloop.counter }}" value="{{ type.lifetime }}">
+                        </div>
+
+                        <div class="card-section">
+                            <label>Flags:</label>
+                            <div>
+                                {% for flag, value in type.flags.items %}
+                                <div>
+                                    <label>{{ flag }}</label>
+                                    <input type="checkbox" name="types_dzn_flags_{{ flag }}_{{ forloop.counter }}" value="1" {% if value == '1' %}checked{% endif %}>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="card-section">
+                            <label>Category:</label>
+                            <input type="text" name="types_dzn_category_{{ forloop.counter }}" value="{{ type.category }}">
+                        </div>
+
+                        <button type="submit" name="save_item" value="{{ forloop.counter }}" class="save-button">Save</button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </form>
+{% endblock %}

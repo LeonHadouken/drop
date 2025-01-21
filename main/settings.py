@@ -44,7 +44,9 @@ DEBUG = True
 #}
 
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
+
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 100000
 
 
 # Application definition

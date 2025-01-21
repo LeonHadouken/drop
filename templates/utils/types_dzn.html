@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Types DZN Data</title>
+</head>
+<body>
+        <!-- Таблица для types_dzn.xml -->
+            <h1>Types Data</h1>
+        <form method="POST">
+        {% csrf_token %}
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Nominal</th>
+                    <th>Lifetime</th>
+                    <th>Category</th>
+                    <th>Flags</th>
+                    <th>Tags</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for type in data.types_dzn %}
+                <tr>
+                    <td><input type="text" name="types_dzn_name_{{ forloop.counter }}" value="{{ type.name }}"></td>
+                    <td><input type="text" name="types_dzn_nominal_{{ forloop.counter }}" value="{{ type.nominal }}"></td>
+                    <td><input type="text" name="types_dzn_lifetime_{{ forloop.counter }}" value="{{ type.lifetime }}"></td>
+                    <td><input type="text" name="types_dzn_category_name_{{ forloop.counter }}" value="{{ type.category_name }}"></td>
+                    <td>
+                        <input type="text" name="types_dzn_flags_count_in_map_{{ forloop.counter }}" value="{{ type.flags_count_in_map }}">
+                        <input type="text" name="types_dzn_flags_count_in_hoarder_{{ forloop.counter }}" value="{{ type.flags_count_in_hoarder }}">
+                    </td>
+                    <td>
+                        {% for key, value in type.items %}
+                        {% if key|slice:":4" == "tag_" %}
+                        <input type="text" name="types_dzn_{{ key }}_{{ forloop.counter }}" value="{{ value }}">
+                        {% endif %}
+                        {% endfor %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <button type="submit">Save Changes</button>
+    </form>
+</body>
+</html>

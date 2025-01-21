@@ -1,17 +1,249 @@
-    <div class="container">
-      <br/>
-      {% if messages %}
-        {% for message in messages %}
-          <div class="alert alert-warning alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
+{% extends 'base.html' %}
+{% block content %}
 
+    <title>Types and Types DZN Data</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
 
-        {% endfor %}
-      {% endif %}
+        .hidden {
+            display: none;
+        }
 
-      {% block content %}
-      {% endblock%}
+        .clickable {
+            cursor: pointer;
+            color: blue;
+            text-decoration: underline;
+        }
+
+        .filters {
+            margin-bottom: 20px;
+        }
+
+        .card-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .card {
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 20px;
+            width: calc(33% - 40px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h3 {
+            margin-top: 0;
+        }
+
+        .card input {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .card {
+                width: calc(50% - 40px);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .card {
+                width: 100%;
+            }
+        }
+    </style>
+    <script>
+        function toggleCardDetails(cardId) {
+            const details = document.getElementById(cardId);
+            details.classList.toggle('hidden');
+        }
+
+        function toggleSectionVisibility(sectionClass, checkboxId) {
+            const section = document.querySelectorAll(`.${sectionClass}`);
+            const checkbox = document.getElementById(checkboxId);
+            section.forEach(s => s.style.display = checkbox.checked ? 'block' : 'none');
+        }
+
+        function searchItems() {
+            const query = document.getElementById("searchInput").value.toLowerCase();
+            const cards = document.querySelectorAll(".card");
+            cards.forEach(card => {
+                const nameField = card.querySelector(".name-field");
+                card.style.display = nameField && nameField.value.toLowerCase().includes(query) ? '' : 'none';
+            });
+        }
+    </script>
+</head>
+<body>
+    <h1>Types and Types DZN Data</h1>
+
+    <!-- Filters -->
+    <div class="filters">
+        <label>
+            <input type="checkbox" id="showTypes" checked onchange="toggleSectionVisibility('types-section', 'showTypes')"> Show Types
+        </label>
+        <label>
+            <input type="checkbox" id="showDZN" checked onchange="toggleSectionVisibility('dzn-section', 'showDZN')"> Show Types DZN
+        </label>
     </div>
 
+    <!-- Search -->
+    <div class="filters">
+        <label for="searchInput">Search by Name:</label>
+        <input type="text" id="searchInput" oninput="searchItems()">
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <!-- Types Section -->
+        <div class="types-section">
+            <h2>Types</h2>
+            <div class="card-container">
+                {% for type in data.types %}
+                <div class="card">
+                    <h3 class="clickable" onclick="toggleCardDetails('typesDetails_{{ forloop.counter }}')">{{ type.name }}</h3>
+                    <div id="typesDetails_{{ forloop.counter }}">
+                        <label>Name:</label>
+                        <input class="name-field" type="text" name="types_name_{{ forloop.counter }}" value="{{ type.name }}">
+
+                        <label>Nominal:</label>
+                        <input type="text" name="types_nominal_{{ forloop.counter }}" value="{{ type.nominal }}">
+
+                        <label>Lifetime:</label>
+                        <input type="text" name="types_lifetime_{{ forloop.counter }}" value="{{ type.lifetime }}">
+
+                        <label>Restock:</label>
+                        <input type="text" name="types_restock_{{ forloop.counter }}" value="{{ type.restock }}">
+
+                        <label>Min:</label>
+                        <input type="text" name="types_min_{{ forloop.counter }}" value="{{ type.min }}">
+
+                        <label>QuantMin:</label>
+                        <input type="text" name="types_quantmin_{{ forloop.counter }}" value="{{ type.quantmin }}">
+
+                        <label>QuantMax:</label>
+                        <input type="text" name="types_quantmax_{{ forloop.counter }}" value="{{ type.quantmax }}">
+
+                        <label>Cost:</label>
+                        <input type="text" name="types_cost_{{ forloop.counter }}" value="{{ type.cost }}">
+
+                        <label>Category:</label>
+                        <input type="text" name="types_category_{{ forloop.counter }}" value="{{ type.category }}">
+
+                        <label>Flags:</label>
+                            <div>
+                                <label>Count in Map:</label>
+                                <input type="checkbox" name="types_flags_count_in_map_{{ forloop.counter }}" value="1" {% if type.flags.count_in_map == '1' %}checked{% endif %}>
+                            </div>
+                            <div>
+                                <label>Count in Hoarder:</label>
+                                <input type="checkbox" name="types_flags_count_in_hoarder_{{ forloop.counter }}" value="1" {% if type.flags.count_in_hoarder == '1' %}checked{% endif %}>
+                            </div>
+                            <div>
+                                <label>Count in Cargo:</label>
+                                <input type="checkbox" name="types_flags_count_in_cargo_{{ forloop.counter }}" value="1" {% if type.flags.count_in_cargo == '1' %}checked{% endif %}>
+                            </div>
+                            <div>
+                                <label>Count in Player:</label>
+                                <input type="checkbox" name="types_flags_count_in_player_{{ forloop.counter }}" value="1" {% if type.flags.count_in_player == '1' %}checked{% endif %}>
+                            </div>
+                            <div>
+                                <label>Crafted:</label>
+                                <input type="checkbox" name="types_flags_crafted_{{ forloop.counter }}" value="1" {% if type.flags.crafted == '1' %}checked{% endif %}>
+                            </div>
+                            <div>
+                                <label>Deloot:</label>
+                                <input type="checkbox" name="types_flags_deloot_{{ forloop.counter }}" value="1" {% if type.flags.deloot == '1' %}checked{% endif %}>
+                            </div>
+
+                        <label>Tags:</label>
+                        {% for tag in type.tags %}
+                        <input type="text" name="types_tags_{{ forloop.counter }}_{{ forloop.counter0 }}" value="{{ tag }}">
+                        {% endfor %}
+
+                        <label>Usage:</label>
+                        {% for usage in type.usage %}
+                        <input type="text" name="types_usage_{{ forloop.counter }}_{{ forloop.counter0 }}" value="{{ usage }}">
+                        {% endfor %}
+
+                        <label>Value:</label>
+                        {% for value in type.value %}
+                        <input type="text" name="types_value_{{ forloop.counter }}_{{ forloop.counter0 }}" value="{{ value }}">
+                        {% endfor %}
+
+                        <label>Attachments:</label>
+                        {% for attachment in type.attachments %}
+                        <div>
+                            Name: <input type="text" name="types_attachments_item_name_{{ forloop.counter }}_{{ forloop.counter0 }}" value="{{ attachment.name }}">
+                            Chance: <input type="text" name="types_attachments_item_chance_{{ forloop.counter }}_{{ forloop.counter0 }}" value="{{ attachment.chance }}">
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Types DZN Section -->
+        <div class="dzn-section">
+            <h2>Types DZN</h2>
+            <div class="card-container">
+                {% for type in data.types_dzn %}
+                <div class="card">
+                    <h3 class="clickable" onclick="toggleCardDetails('dznDetails_{{ forloop.counter }}')">{{ type.name }}</h3>
+                    <div id="dznDetails_{{ forloop.counter }}">
+                        <label>Name:</label>
+                        <input class="name-field" type="text" name="types_dzn_name_{{ forloop.counter }}" value="{{ type.name }}">
+
+                        <label>Nominal:</label>
+                        <input type="text" name="types_dzn_nominal_{{ forloop.counter }}" value="{{ type.nominal }}">
+
+                        <label>Lifetime:</label>
+                        <input type="text" name="types_dzn_lifetime_{{ forloop.counter }}" value="{{ type.lifetime }}">
+
+                        <label>Category:</label>
+                        <input type="text" name="types_dzn_category_{{ forloop.counter }}" value="{{ type.category }}">
+
+                        <label>Flags:</label>
+                        {% for key, value in type.flags.items %}
+                        <div>{{ key }}: <input type="text" name="types_dzn_flags_{{ key }}_{{ forloop.counter }}" value="{{ value }}"></div>
+                        {% endfor %}
+
+                        <label>Tags:</label>
+                        {% for tag in type.tags %}
+                        <input type="text" name="types_dzn_tags_{{ forloop.counter }}_{{ forloop.counter0 }}" value="{{ tag }}">
+                        {% endfor %}
+
+                        <label>Usage:</label>
+                        {% for usage in type.usage %}
+                        <input type="text" name="types_dzn_usage_{{ forloop.counter }}_{{ forloop.counter0 }}" value="{{ usage }}">
+                        {% endfor %}
+
+                        <label>Value:</label>
+                        {% for value in type.value %}
+                        <input type="text" name="types_dzn_value_{{ forloop.counter }}_{{ forloop.counter0 }}" value="{{ value }}">
+                        {% endfor %}
+
+                        <label>Attachments:</label>
+                        {% for attachment in type.attachments %}
+                        <div>
+                            Name: <input type="text" name="types_dzn_attachments_item_name_{{ forloop.counter }}_{{ forloop.counter0 }}" value="{{ attachment.name }}">
+                            Chance: <input type="text" name="types_dzn_attachments_item_chance_{{ forloop.counter }}_{{ forloop.counter0 }}" value="{{ attachment.chance }}">
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <button type="submit">Save Changes</button>
+    </form>
+</body>
+</html>
+{% endblock %}
